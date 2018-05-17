@@ -1,6 +1,5 @@
 package com.skills.interapt.taskmanagerandroid;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,11 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-public class Tab2Fragment extends Fragment implements Tab2Adapter.AdapterCallbackTab2, AddTaskFragment.ActivityCallbackTab2{
+public class Tab2Fragment extends Fragment implements TaskAdapterTab2.AdapterCallbackTab2, AddTaskFragment.ActivityCallback{
 
     private TaskDatabase taskDatabaseTab2;
-    private Tab2Adapter tab2Adapter;
-    //    private List<Tasks> videoGameList;
+    private TaskAdapterTab2 tab2Adapter;
     private LinearLayoutManager linearLayoutManagerTab2;
     private RecyclerView recyclerViewTab2;
 
@@ -41,37 +39,31 @@ public class Tab2Fragment extends Fragment implements Tab2Adapter.AdapterCallbac
     private void populateRecyclerView() {
 
         linearLayoutManagerTab2 = new LinearLayoutManager(getContext());
-        tab2Adapter = new Tab2Adapter(taskDatabaseTab2.taskDao().getTasks(), this);
+        tab2Adapter = new TaskAdapterTab2(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted(),  this);
         recyclerViewTab2.setLayoutManager(linearLayoutManagerTab2);
-        recyclerViewTab2.setHasFixedSize(true);
+        recyclerViewTab2.setHasFixedSize(false);
         recyclerViewTab2.setAdapter(tab2Adapter);
         tab2Adapter.notifyDataSetChanged();
     }
-
     @Override
-    public Context getContextTab2() {
-        return getActivity().getApplicationContext();
-    }
-
-    @Override
-    public void rowClickedTab2(Tasks tasksNotCompleted) {
-        if (tasksNotCompleted.isCompleted()) {
-            checkGameBackIn(tasksNotCompleted);
+    public void rowOnClickedTab2(TaskNotCompleted tasksNotCompleted) {
+        if (!tasksNotCompleted.isCompletedNotC()) {
+            markTaskAsCompleted(tasksNotCompleted);
         } else {
-            checkGameOut(tasksNotCompleted);
+            markAsNotCompleted(tasksNotCompleted);
         }
     }
 
     @Override
-    public void rowLongClickedTab2(final Tasks tasksNotCompleted) {
+    public void rowLongClickedTab2(final TaskNotCompleted tasksNotCompleted) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete this Task?")
                 .setMessage("Are you sure you would like to delete this task?")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        taskDatabaseTab2.taskDao().deleteTaskList(tasksNotCompleted);
-                        tab2Adapter.updateList(taskDatabaseTab2.taskDao().getTasks());
+                        taskDatabaseTab2.taskDaoTab2().deleteTaskListNotC(tasksNotCompleted);
+                        tab2Adapter.updateList(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted());
                         Toast.makeText(getActivity(), "Task Deleted!", Toast.LENGTH_LONG).show();
                     }
                 })
@@ -84,21 +76,20 @@ public class Tab2Fragment extends Fragment implements Tab2Adapter.AdapterCallbac
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-
-    private void checkGameOut(final Tasks tasksNotCompleted) {
+    private void markTaskAsCompleted(final TaskNotCompleted tasksNotCompleted) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Checkout Game?")
-                .setMessage("Are you sure you would like to check out this game?")
+        builder.setTitle("Mark As Complete?")
+                .setMessage("Are you sure you would like to mark this task as complete?")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        tasksNotCompleted.setCompleted(true);
+                        tasksNotCompleted.setCompletedNotC(true);
                         //Update Database record for this game
-                        taskDatabaseTab2.taskDao().updateTaskList(tasksNotCompleted);
+                        taskDatabaseTab2.taskDaoTab2().updateTaskListNotC(tasksNotCompleted);
                         //tell our adapter that the database has been updated so it will update our view.
-                        tab2Adapter.updateList(taskDatabaseTab2.taskDao().getTasks());
+                        tab2Adapter.updateList(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted());
                         //Tell users that this game has been checked out
-                        Toast.makeText(getActivity(), "Game Checked Out!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Task Completed", Toast.LENGTH_LONG).show();
 
                     }
                 })
@@ -112,20 +103,20 @@ public class Tab2Fragment extends Fragment implements Tab2Adapter.AdapterCallbac
                 .show();
     }
 
-    private void checkGameBackIn(final Tasks tasksNotCompleted) {
+    private void markAsNotCompleted(final TaskNotCompleted tasksNotCompleted) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.check_in_game)
-                .setMessage(R.string.check_in_message)
+        builder.setTitle(R.string.mark_as_not_completed)
+                .setMessage(R.string.mark_as_not_complete)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        tasksNotCompleted.setCompleted(false);
+                        tasksNotCompleted.setCompletedNotC(false);
                         //Update database with updated game information
-                        taskDatabaseTab2.taskDao().updateTaskList(tasksNotCompleted);
+                        taskDatabaseTab2.taskDaoTab2().updateTaskListNotC(tasksNotCompleted);
                         //Let our adapter know that information in the database has changed to update our view accordingly
-                        tab2Adapter.updateList(taskDatabaseTab2.taskDao().getTasks());
+                        tab2Adapter.updateList(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted());
 
-                        Toast.makeText(getActivity(), R.string.game_checked_in, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), R.string.not_completed_mark, Toast.LENGTH_LONG).show();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -139,7 +130,8 @@ public class Tab2Fragment extends Fragment implements Tab2Adapter.AdapterCallbac
     }
 
     @Override
-    public void activityCallbackTab2() {
-        tab2Adapter.updateList(taskDatabaseTab2.taskDao().getTasks());
+    public void addClicked() {
+        tab2Adapter.updateList(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted());
+
     }
 }

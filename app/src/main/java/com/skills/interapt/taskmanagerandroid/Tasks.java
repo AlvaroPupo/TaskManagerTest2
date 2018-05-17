@@ -5,10 +5,12 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.Query;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 
 @Entity
-public class Tasks {
+public class Tasks implements Parcelable{
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -28,6 +30,28 @@ public class Tasks {
         this.timeDue = timeDue;
         this.dateCreated = dateCreated;
     }
+
+    protected Tasks(Parcel in) {
+        id = in.readInt();
+        taskTitle = in.readString();
+        taskDescription = in.readString();
+        isCompleted = in.readByte() != 0;
+        dateDue = in.readString();
+        timeDue = in.readString();
+        dateCreated = in.readString();
+    }
+
+    public static final Creator<Tasks> CREATOR = new Creator<Tasks>() {
+        @Override
+        public Tasks createFromParcel(Parcel in) {
+            return new Tasks(in);
+        }
+
+        @Override
+        public Tasks[] newArray(int size) {
+            return new Tasks[size];
+        }
+    };
 
     public int getId() {
         return id;
@@ -86,4 +110,19 @@ public class Tasks {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(taskTitle);
+        dest.writeString(taskDescription);
+        dest.writeByte((byte) (isCompleted ? 1 : 0));
+        dest.writeString(dateDue);
+        dest.writeString(timeDue);
+        dest.writeString(dateCreated);
+    }
 }

@@ -27,5 +27,7 @@ public interface TaskDao {
     //Allows us to delete a game from the library
     @Delete
     void deleteTaskList(Tasks tasks);
+
+
 }
 

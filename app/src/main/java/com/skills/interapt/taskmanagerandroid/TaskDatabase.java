@@ -9,12 +9,16 @@ import com.skills.interapt.taskmanagerandroid.DateConverter;
 import com.skills.interapt.taskmanagerandroid.TaskDao;
 import com.skills.interapt.taskmanagerandroid.Tasks;
 
-@Database(version = 1, entities = Tasks.class)
+@Database(version = 1, entities = {Tasks.class, TaskCompleted.class, TaskNotCompleted.class} )
 @TypeConverters(DateConverter.class)
 abstract class TaskDatabase extends RoomDatabase {
 
 
     public abstract TaskDao taskDao();
+
+    public abstract TaskDaoTab2 taskDaoTab2();
+
+    public abstract TaskDaoTab3 taskDaoTab3();
 
 }
 

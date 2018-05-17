@@ -19,15 +19,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallback, AddTaskFragment.ActivityCallback {
+public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallback, AddTaskFragment.ActivityCallback, EditTasks.InfoCallback{
 
     @BindView(R.id.recycler_view_tab1)
     protected RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
+    private EditTasks editTasks;
+//    private SyncView syncView;
 
     private TaskDatabase taskDatabase;
     private TaskAdapter taskAdapter;
-    //    private List<Tasks> videoGameList;
+
     private LinearLayoutManager linearLayoutManager;
     private AddTaskFragment addTaskFragment;
 
@@ -53,7 +55,7 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         linearLayoutManager = new LinearLayoutManager(getContext());
         taskAdapter = new TaskAdapter(taskDatabase.taskDao().getTasks(), this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(false);
         recyclerView.setAdapter(taskAdapter);
         taskAdapter.notifyDataSetChanged();
     }
@@ -64,13 +66,17 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         addTaskFragment = AddTaskFragment.newInstance();
         addTaskFragment.attachParent(this);
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.contraint_layout_tab1, addTaskFragment).commit();
-
-
     }
 
     @Override
     public void addClicked() {
         getActivity().getSupportFragmentManager().beginTransaction().remove(addTaskFragment).commit();
+        taskAdapter.updateList(taskDatabase.taskDao().getTasks());
+        floatingActionButton.setVisibility(View.VISIBLE);
+    }
+    @Override
+    public void getInfo() {
+        getActivity().getSupportFragmentManager().beginTransaction().remove(editTasks).commit();
         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
         floatingActionButton.setVisibility(View.VISIBLE);
     }
@@ -83,11 +89,17 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
 
     @Override
     public void rowClicked(Tasks tasks) {
-        if (tasks.isCompleted()) {
-            checkGameBackIn(tasks);
-        } else {
-            checkGameOut(tasks);
-        }
+//        if (tasks.isCompleted()) {
+//            markAsNotCompleted(tasks);
+//        } else {
+//            markAsCompleted(tasks);
+//        }
+        editTasks = EditTasks.newInstance();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("TASK", tasks);
+        editTasks.setArguments(bundle);
+        editTasks.attachParentEditTasks(this);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.contraint_layout_tab1, editTasks).commit();
     }
 
 
@@ -114,10 +126,10 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
                 .show();
     }
 
-    private void checkGameOut(final Tasks tasks) {
+    private void markAsCompleted(final Tasks tasks) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Checkout Game?")
-                .setMessage("Are you sure you would like to check out this game?")
+        builder.setTitle("Mark As Complete?")
+                .setMessage("Are you sure you would like to mark this task as complete?")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -127,7 +139,7 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
                         //tell our adapter that the database has been updated so it will update our view.
                         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
                         //Tell users that this game has been checked out
-                        Toast.makeText(getActivity(), "Game Checked Out!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Task Completed!", Toast.LENGTH_LONG).show();
 
                     }
                 })
@@ -141,10 +153,10 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
                 .show();
     }
 
-    private void checkGameBackIn(final Tasks tasks) {
+    private void markAsNotCompleted(final Tasks tasks) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.check_in_game)
-                .setMessage(R.string.check_in_message)
+        builder.setTitle(R.string.mark_as_not_completed)
+                .setMessage(R.string.mark_as_not_complete)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -154,7 +166,7 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
                         //Let our adapter know that information in the database has changed to update our view accordingly
                         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
 
-                        Toast.makeText(getActivity(), R.string.game_checked_in, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), R.string.not_completed_mark, Toast.LENGTH_LONG).show();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -167,5 +179,9 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
                 .show();
     }
 
+
 }
+
+
+
 

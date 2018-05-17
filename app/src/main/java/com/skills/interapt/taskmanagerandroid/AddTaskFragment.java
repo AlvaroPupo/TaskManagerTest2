@@ -29,7 +29,6 @@ import butterknife.OnClick;
 public class AddTaskFragment extends Fragment implements View.OnClickListener{
 
     private ActivityCallback activityCallback;
-    private ActivityCallbackTab2 activityCallbackTab2;
     private TaskDatabase taskDatabase;
     private FloatingActionButton floatingActionButton;
 
@@ -137,26 +136,24 @@ public class AddTaskFragment extends Fragment implements View.OnClickListener{
             Toast.makeText(getActivity(), "Please enter required fields", Toast.LENGTH_LONG).show();
         } else {
             Tasks tasks = new Tasks(taskTitle.getText().toString(), taskDescription.getText().toString(), newDate, newTime, timeCreated);
+            TaskNotCompleted taskNotCompleted = new TaskNotCompleted(taskTitle.getText().toString(), taskDescription.getText().toString(),false, newDate, newTime, timeCreated);
+            TaskCompleted taskCompleted = new TaskCompleted(taskTitle.getText().toString(), taskDescription.getText().toString(), true, newDate, newTime, timeCreated);
 
-            addTaskToDatabase(tasks);
-//            addTaskNotCompletedToDatabase(tasks);
+            addTaskToDatabase(tasks, taskNotCompleted, taskCompleted);
             Toast.makeText(getActivity(), "Task Added!!", Toast.LENGTH_LONG).show();
         }
     }
 
-    private void addTaskToDatabase(final Tasks tasks) {
+    private void addTaskToDatabase(final Tasks tasks, final TaskNotCompleted taskNotCompleted, final TaskCompleted taskCompleted) {
         taskDatabase.taskDao().addTasks(tasks);
+        taskDatabase.taskDaoTab2().addTasksTab2(taskNotCompleted);
+        taskDatabase.taskDaoTab3().addTasksTab3(taskCompleted);
         activityCallback.addClicked();
-    }
-    private void addTaskNotCompletedToDatabase(final Tasks tasksNotCompleted){
-        taskDatabase.taskDao().addTasks(tasksNotCompleted);
-        activityCallbackTab2.activityCallbackTab2();
     }
 
     public void attachParent(ActivityCallback activityCallback) {
 
         this.activityCallback = activityCallback;
-        this.activityCallbackTab2 = activityCallbackTab2;
     }
 
 
@@ -164,8 +161,6 @@ public class AddTaskFragment extends Fragment implements View.OnClickListener{
 
         void addClicked();
     }
-    public interface ActivityCallbackTab2{
 
-        void activityCallbackTab2();
-    }
+
 }

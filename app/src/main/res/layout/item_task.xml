@@ -31,7 +31,7 @@
         android:layout_marginTop="16dp"
         android:text="@string/task_due_date"
         android:textColor="@android:color/white"
-        android:textSize="23sp"
+        android:textSize="20sp"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"

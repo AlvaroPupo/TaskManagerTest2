@@ -21,10 +21,12 @@ import butterknife.ButterKnife;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private List<Tasks> tasksList;
+
+
     private AdapterCallback adapterCallback;
+    private Tasks tasks;
 
     public TaskAdapter(List<Tasks> tasksList, AdapterCallback adapterCallback) {
-
         this.tasksList = tasksList;
         this.adapterCallback = adapterCallback;
     }
@@ -84,22 +86,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             timeCreated.setText(adapterCallback.getContext().getString(R.string.created_on, tasks.getDateCreated()));
 
             if (tasks.isCompleted()) {
-                //Show the day the game was checked out on
-//                tasks.setDate(new Date());
-                //Change background color to red
+
                 rowLayout.setBackgroundResource(R.color.colorPrimary);
                 Calendar calendar = Calendar.getInstance();
                 Date date = calendar.getTime();
-                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy - HH:mm a", Locale.US);
                 taskDate.setText(adapterCallback.getContext().getString(R.string.completed_on, formatter.format(date)));
-                //Calculate check back in date
-//                int numberOfDays = 14;
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.setTime();
-//                calendar.add();
-//                Date date = calendar.getTime();
-//                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
-//                taskDate.setText(adapterCallback.getContext().getString(R.string.task_due_date, formatter.format(date)));
+
             } else {
                 rowLayout.setBackgroundResource(R.color.green);
             }
@@ -125,6 +118,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             };
         }
     }
+
 
     public interface AdapterCallback {
         Context getContext();
