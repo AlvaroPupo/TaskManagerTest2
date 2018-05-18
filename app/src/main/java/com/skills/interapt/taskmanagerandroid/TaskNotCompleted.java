@@ -2,9 +2,12 @@ package com.skills.interapt.taskmanagerandroid;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.widget.Switch;
 
 @Entity
-public class TaskNotCompleted {
+public class TaskNotCompleted implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -25,6 +28,28 @@ public class TaskNotCompleted {
         this.timeDueNotC = timeDueNotC;
         this.dateCreatedNotC = dateCreatedNotC;
     }
+
+    protected TaskNotCompleted(Parcel in) {
+        id = in.readInt();
+        taskTitleNotC = in.readString();
+        taskDescriptionNotC = in.readString();
+        isCompletedNotC = in.readByte() != 0;
+        dateDueNotC = in.readString();
+        timeDueNotC = in.readString();
+        dateCreatedNotC = in.readString();
+    }
+
+    public static final Creator<TaskNotCompleted> CREATOR = new Creator<TaskNotCompleted>() {
+        @Override
+        public TaskNotCompleted createFromParcel(Parcel in) {
+            return new TaskNotCompleted(in);
+        }
+
+        @Override
+        public TaskNotCompleted[] newArray(int size) {
+            return new TaskNotCompleted[size];
+        }
+    };
 
     public int getId() {
         return id;
@@ -80,5 +105,21 @@ public class TaskNotCompleted {
 
     public void setDateCreatedNotC(String dateCreatedNotC) {
         this.dateCreatedNotC = dateCreatedNotC;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(taskTitleNotC);
+        dest.writeString(taskDescriptionNotC);
+        dest.writeByte((byte) (isCompletedNotC ? 1 : 0));
+        dest.writeString(dateDueNotC);
+        dest.writeString(timeDueNotC);
+        dest.writeString(dateCreatedNotC);
     }
 }

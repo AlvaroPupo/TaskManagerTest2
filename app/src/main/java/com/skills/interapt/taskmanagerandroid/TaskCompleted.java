@@ -2,9 +2,11 @@ package com.skills.interapt.taskmanagerandroid;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 @Entity
-public class TaskCompleted {
+public class TaskCompleted implements Parcelable{
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -25,6 +27,28 @@ public class TaskCompleted {
         this.timeDueDone = timeDueDone;
         this.dateCreatedDone = dateCreatedDone;
     }
+
+    protected TaskCompleted(Parcel in) {
+        id = in.readInt();
+        taskTitleDone = in.readString();
+        taskDescriptionDone = in.readString();
+        isCompletedDone = in.readByte() != 0;
+        dateDueDone = in.readString();
+        timeDueDone = in.readString();
+        dateCreatedDone = in.readString();
+    }
+
+    public static final Creator<TaskCompleted> CREATOR = new Creator<TaskCompleted>() {
+        @Override
+        public TaskCompleted createFromParcel(Parcel in) {
+            return new TaskCompleted(in);
+        }
+
+        @Override
+        public TaskCompleted[] newArray(int size) {
+            return new TaskCompleted[size];
+        }
+    };
 
     public int getId() {
         return id;
@@ -80,5 +104,21 @@ public class TaskCompleted {
 
     public void setDateCreatedDone(String dateCreatedDone) {
         this.dateCreatedDone = dateCreatedDone;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(taskTitleDone);
+        dest.writeString(taskDescriptionDone);
+        dest.writeByte((byte) (isCompletedDone ? 1 : 0));
+        dest.writeString(dateDueDone);
+        dest.writeString(timeDueDone);
+        dest.writeString(dateCreatedDone);
     }
 }

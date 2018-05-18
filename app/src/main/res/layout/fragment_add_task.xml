@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="#655a9a"
     android:clickable="true"
+    android:elevation="5dp"
     android:focusable="true">
 
     <android.support.design.widget.FloatingActionButton

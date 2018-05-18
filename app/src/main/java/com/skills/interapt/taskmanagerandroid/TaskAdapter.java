@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -17,6 +19,7 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
@@ -39,12 +42,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         return new ViewHolder(itemView);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bindTask(tasksList.get(position));
 
         holder.itemView.setOnClickListener(holder.onClick(tasksList.get(position)));
         holder.itemView.setOnLongClickListener(holder.onLongClick(tasksList.get(position)));
+        holder.switchTasks.setOnCheckedChangeListener(holder.onSwithClicked(tasksList.get(position)));
     }
 
     @Override
@@ -70,6 +75,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         protected TextView taskDescription;
         @BindView(R.id.item_date_created)
         protected TextView timeCreated;
+        @BindView(R.id.switch_tasks)
+        protected Switch switchTasks;
 
 
         public ViewHolder(View itemView) {
@@ -86,17 +93,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             timeCreated.setText(adapterCallback.getContext().getString(R.string.created_on, tasks.getDateCreated()));
 
             if (tasks.isCompleted()) {
-
-                rowLayout.setBackgroundResource(R.color.colorPrimary);
-                Calendar calendar = Calendar.getInstance();
-                Date date = calendar.getTime();
-                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy - HH:mm a", Locale.US);
-                taskDate.setText(adapterCallback.getContext().getString(R.string.completed_on, formatter.format(date)));
-
-            } else {
-                rowLayout.setBackgroundResource(R.color.green);
+                    rowLayout.setBackgroundResource(R.color.colorPrimary);
+                    Calendar calendar = Calendar.getInstance();
+                    Date date = calendar.getTime();
+                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy - HH:mm a", Locale.US);
+                    taskDate.setText(adapterCallback.getContext().getString(R.string.completed_on, formatter.format(date)));
+                    switchTasks.setText("Mark As Not Completed?");
+                } else {
+                    rowLayout.setBackgroundResource(R.color.green);
+                    switchTasks.setText("Mark As Completed?");
+                }
             }
-        }
 
 
         public View.OnClickListener onClick(final Tasks tasks) {
@@ -117,6 +124,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                 }
             };
         }
+
+        public CompoundButton.OnCheckedChangeListener onSwithClicked(final Tasks tasks) {
+            return new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    adapterCallback.onSwitchClicked(tasks);
+                }
+            };
+        }
     }
 
 
@@ -124,5 +140,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         Context getContext();
         void rowClicked(Tasks tasks);
         void rowLongClicked(Tasks tasks);
+        void onSwitchClicked(Tasks tasks);
     }
 }

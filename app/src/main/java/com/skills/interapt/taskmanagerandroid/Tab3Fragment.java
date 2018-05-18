@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,13 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCallbackTab3{
-
+public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCallbackTab3, EditTasks.InfoCallbackTab3{
 
     private TaskDatabase taskDatabaseTab3;
     private TaskAdapterTab3 tab3Adapter;
     private LinearLayoutManager linearLayoutManagerTab3;
     private RecyclerView recyclerViewTab3;
+    private EditTasks editTasks;
+    private FloatingActionButton floatingActionButton;
 
     @Nullable
     @Override
@@ -33,6 +35,7 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
         super.onStart();
         recyclerViewTab3 = getActivity().findViewById(R.id.recycler_view_tab3);
         taskDatabaseTab3 = ((TaskApplication) getActivity().getApplicationContext()).getDatabase();
+        floatingActionButton = getActivity().findViewById(R.id.add_tasks_fab);
         populateRecyclerView();
     }
 
@@ -48,11 +51,18 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
 
     @Override
     public void rowClickedTab3(TaskCompleted tasksCompleted) {
-        if (tasksCompleted.isCompletedDone()) {
-            markAsNotCompleted(tasksCompleted);
-        } else {
-            markAsCompleted(tasksCompleted);
-        }
+        editTasks = EditTasks.newInstance();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("TASKS_COMPLETED", tasksCompleted);
+        editTasks.setArguments(bundle);
+        editTasks.attachParentEditTasksTab3(this);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.constraint_layout_tab3, editTasks).commit();
+    }
+    @Override
+    public void getInfoTab3() {
+        getActivity().getSupportFragmentManager().beginTransaction().remove(editTasks).commit();
+        tab3Adapter.updateList(taskDatabaseTab3.taskDaoTab3().getAllTasksCompleted());
+        floatingActionButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -130,11 +140,4 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-
-
-//    @Override
-//    public void bindCompletedTasksTab3(TaskCompleted taskCompleted) {
-//        taskDatabaseTab3.taskDaoTab3().addTasksTab3(taskCompleted);
-//        tab3Adapter.updateList(taskDatabaseTab3.taskDaoTab3().getAllTasksCompleted());
-//    }
 }

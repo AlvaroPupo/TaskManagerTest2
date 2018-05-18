@@ -17,6 +17,10 @@ public class MainActivityTabs extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private ViewPager mViewPager;
+    private EditTasks editTasks;
+    private AddTaskFragment addTaskFragment;
+    private TaskAdapter taskAdapter;
+    private TaskDatabase taskDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,9 @@ public class MainActivityTabs extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+//
+//        taskDatabase = ((TaskApplication) getApplication().getApplicationContext()).getDatabase();
+//        taskAdapter =  new TaskAdapter(taskDatabase.taskDao().getTasks(), this);
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
@@ -65,6 +72,7 @@ public class MainActivityTabs extends AppCompatActivity {
         position += 1;
            switch(position){
                case 1:
+//                   taskAdapter.updateList(taskDatabase.taskDao().getTasks());
                    return new Tab1Fragment();
                case 2:
                    return new Tab2Fragment();
@@ -79,4 +87,5 @@ public class MainActivityTabs extends AppCompatActivity {
             return 3;
         }
     }
-}
+    }
+

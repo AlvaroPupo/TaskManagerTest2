@@ -137,30 +137,27 @@ public class AddTaskFragment extends Fragment implements View.OnClickListener{
         } else {
             Tasks tasks = new Tasks(taskTitle.getText().toString(), taskDescription.getText().toString(), newDate, newTime, timeCreated);
             TaskNotCompleted taskNotCompleted = new TaskNotCompleted(taskTitle.getText().toString(), taskDescription.getText().toString(),false, newDate, newTime, timeCreated);
-            TaskCompleted taskCompleted = new TaskCompleted(taskTitle.getText().toString(), taskDescription.getText().toString(), true, newDate, newTime, timeCreated);
+//            TaskCompleted taskCompleted = new TaskCompleted(taskTitle.getText().toString(), taskDescription.getText().toString(), false, newDate, newTime, timeCreated);
 
-            addTaskToDatabase(tasks, taskNotCompleted, taskCompleted);
+            addTaskToDatabase(tasks, taskNotCompleted);
             Toast.makeText(getActivity(), "Task Added!!", Toast.LENGTH_LONG).show();
         }
     }
 
-    private void addTaskToDatabase(final Tasks tasks, final TaskNotCompleted taskNotCompleted, final TaskCompleted taskCompleted) {
+    private void addTaskToDatabase(final Tasks tasks, final TaskNotCompleted taskNotCompleted) {
+
         taskDatabase.taskDao().addTasks(tasks);
         taskDatabase.taskDaoTab2().addTasksTab2(taskNotCompleted);
-        taskDatabase.taskDaoTab3().addTasksTab3(taskCompleted);
+//        taskDatabase.taskDaoTab3().addTasksTab3(taskCompleted);
         activityCallback.addClicked();
     }
 
     public void attachParent(ActivityCallback activityCallback) {
-
         this.activityCallback = activityCallback;
     }
 
 
     public interface ActivityCallback {
-
         void addClicked();
     }
-
-
 }

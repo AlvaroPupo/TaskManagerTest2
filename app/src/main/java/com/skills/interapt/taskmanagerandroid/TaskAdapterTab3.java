@@ -22,10 +22,16 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
 
     private List<TaskCompleted> tasksCompletedList;
     private AdapterCallbackTab3 adapterCallbackTab3;
+    private TaskAdapter.AdapterCallback adapterCallback;
 
     public TaskAdapterTab3(List<TaskCompleted> tasksCompletedList, AdapterCallbackTab3 adapterCallbackTab3) {
         this.tasksCompletedList = tasksCompletedList;
         this.adapterCallbackTab3 = adapterCallbackTab3;
+    }
+
+    public TaskAdapterTab3(List<TaskCompleted> allTasksCompleted, TaskAdapter.AdapterCallback adapterCallback) {
+        this.tasksCompletedList = allTasksCompleted;
+        this.adapterCallback = adapterCallback;
     }
 
     @NonNull
@@ -74,27 +80,24 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
 
         public void bindCompletedTasks(TaskCompleted tasks) {
 
-            tasks.setCompletedDone(false);
-            if (!tasks.isCompletedDone()) {
+
+            if(tasks.isCompletedDone()) {
+                    rowLayout.setVisibility(View.VISIBLE);
+                    taskTitle.setText(tasks.getTaskTitleDone());
+                    taskDescription.setText(adapterCallbackTab3.getContext().getString(R.string.task_description, tasks.getTaskDescriptionDone()));
+                    taskDate.setVisibility(View.VISIBLE);
+                    taskDate.setText(adapterCallbackTab3.getContext().getString(R.string.task_due_date, tasks.getDateDueDone(), tasks.getTimeDueDone()));
+                    timeCreated.setText(adapterCallbackTab3.getContext().getString(R.string.created_on, tasks.getDateCreatedDone()));
+
+                    rowLayout.setBackgroundResource(R.color.colorPrimary);
+                    Calendar calendar = Calendar.getInstance();
+                    Date date = calendar.getTime();
+                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy - HH:mm a", Locale.US);
+                    taskDate.setText(adapterCallbackTab3.getContext().getString(R.string.completed_on, formatter.format(date)));
+                } else {
                 rowLayout.setVisibility(View.INVISIBLE);
-            } else {
-                rowLayout.setVisibility(View.VISIBLE);
-                taskTitle.setText(tasks.getTaskTitleDone());
-                taskDescription.setText(adapterCallbackTab3.getContext().getString(R.string.task_description, tasks.getTaskDescriptionDone()));
-                taskDate.setVisibility(View.VISIBLE);
-                taskDate.setText(adapterCallbackTab3.getContext().getString(R.string.task_due_date, tasks.getDateDueDone(), tasks.getTimeDueDone()));
-                timeCreated.setText(adapterCallbackTab3.getContext().getString(R.string.created_on, tasks.getDateCreatedDone()));
-
-            rowLayout.setBackgroundResource(R.color.colorPrimary);
-            Calendar calendar = Calendar.getInstance();
-            Date date = calendar.getTime();
-            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy - HH:mm a", Locale.US);
-            taskDate.setText(adapterCallbackTab3.getContext().getString(R.string.completed_on, formatter.format(date)));
-
-
-
             }
-        }
+            }
 
         public View.OnClickListener onClick(final TaskCompleted tasks) {
             return new View.OnClickListener() {
