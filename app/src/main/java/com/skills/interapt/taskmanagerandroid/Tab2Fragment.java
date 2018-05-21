@@ -43,15 +43,16 @@ public class Tab2Fragment extends Fragment implements TaskAdapterTab2.AdapterCal
     private void populateRecyclerView() {
 
         linearLayoutManagerTab2 = new LinearLayoutManager(getContext());
-        tab2Adapter = new TaskAdapterTab2(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted(),  this);
+        tab2Adapter = new TaskAdapterTab2(taskDatabaseTab2.taskDao().getTasks(),  this);
         recyclerViewTab2.setLayoutManager(linearLayoutManagerTab2);
         recyclerViewTab2.setHasFixedSize(false);
         recyclerViewTab2.setAdapter(tab2Adapter);
         tab2Adapter.notifyDataSetChanged();
     }
     @Override
-    public void rowOnClickedTab2(TaskNotCompleted tasksNotCompleted) {
+    public void rowOnClickedTab2(Tasks tasksNotCompleted) {
 
+        floatingActionButton.setVisibility(View.INVISIBLE);
         editTasks = EditTasks.newInstance();
         Bundle bundle = new Bundle();
         bundle.putParcelable("TASKS_NOT_COMPLETED", tasksNotCompleted);
@@ -62,47 +63,36 @@ public class Tab2Fragment extends Fragment implements TaskAdapterTab2.AdapterCal
     @Override
     public void getInfoTab2() {
         getActivity().getSupportFragmentManager().beginTransaction().remove(editTasks).commit();
-        tab2Adapter.updateList(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted());
+        tab2Adapter.updateList(taskDatabaseTab2.taskDao().getTasks());
         floatingActionButton.setVisibility(View.VISIBLE);
+        tab2Adapter.notifyDataSetChanged();
     }
 
     @Override
-    public void rowLongClickedTab2(final TaskNotCompleted tasksNotCompleted) {
+    public void rowLongClickedTab2(final Tasks tasksNotCompleted) {
+
+    }
+
+    @Override
+    public void onSwitchClickedTab2(Tasks taskNotCompleted) {
+        if (!taskNotCompleted.isCompleted()) {
+            markTaskAsCompleted(taskNotCompleted);
+        }
+    }
+
+    @Override
+    public void onDeleteTaskButtonClicked(final Tasks tasks) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete this Task?")
                 .setMessage("Are you sure you would like to delete this task?")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        taskDatabaseTab2.taskDaoTab2().deleteTaskListNotC(tasksNotCompleted);
-                        tab2Adapter.updateList(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted());
+                        taskDatabaseTab2.taskDao().deleteTaskList(tasks);
+                        tab2Adapter.updateList(taskDatabaseTab2.taskDao().getTasks());
                         Toast.makeText(getActivity(), "Task Deleted!", Toast.LENGTH_LONG).show();
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
-    private void markTaskAsCompleted(final TaskNotCompleted tasksNotCompleted) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Mark As Complete?")
-                .setMessage("Are you sure you would like to mark this task as complete?")
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        tasksNotCompleted.setCompletedNotC(true);
-                        //Update Database record for this game
-                        taskDatabaseTab2.taskDaoTab2().updateTaskListNotC(tasksNotCompleted);
-                        //tell our adapter that the database has been updated so it will update our view.
-                        tab2Adapter.updateList(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted());
-                        //Tell users that this game has been checked out
-                        Toast.makeText(getActivity(), "Task Completed", Toast.LENGTH_LONG).show();
-
+                        tab2Adapter.notifyDataSetChanged();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -115,29 +105,12 @@ public class Tab2Fragment extends Fragment implements TaskAdapterTab2.AdapterCal
                 .show();
     }
 
-    private void markAsNotCompleted(final TaskNotCompleted tasksNotCompleted) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.mark_as_not_completed)
-                .setMessage(R.string.mark_as_not_complete)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        tasksNotCompleted.setCompletedNotC(false);
-                        //Update database with updated game information
-                        taskDatabaseTab2.taskDaoTab2().updateTaskListNotC(tasksNotCompleted);
-                        //Let our adapter know that information in the database has changed to update our view accordingly
-                        tab2Adapter.updateList(taskDatabaseTab2.taskDaoTab2().getAllTasksNotCompleted());
+    private void markTaskAsCompleted(final Tasks tasksNotCompleted) {
 
-                        Toast.makeText(getActivity(), R.string.not_completed_mark, Toast.LENGTH_LONG).show();
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+        tasksNotCompleted.setCompleted(true);
+        taskDatabaseTab2.taskDao().updateTaskList(tasksNotCompleted);
+        tab2Adapter.updateList(taskDatabaseTab2.taskDao().getTasks());
+        Toast.makeText(getActivity(), "Task Completed", Toast.LENGTH_LONG).show();
+        tab2Adapter.notifyDataSetChanged();
     }
 }

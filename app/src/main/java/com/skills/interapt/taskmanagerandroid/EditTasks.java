@@ -30,10 +30,9 @@ public class EditTasks extends Fragment implements View.OnClickListener {
     private InfoCallback infoCallback;
     private TaskDatabase taskDatabase;
     private TaskAdapter taskAdapter;
-    private FloatingActionButton floatingActionButton;
     private Tasks taskToEdit;
-    private TaskNotCompleted taskNotCompletedToEdit;
-    private TaskCompleted taskCompletedToEdit;
+    private Tasks taskNotCompletedToEdit;
+    private Tasks taskCompletedToEdit;
     private InfoCallbackTab2 infoCallbackTab2;
     private InfoCallbackTab3 infoCallbackTab3;
 
@@ -62,8 +61,6 @@ public class EditTasks extends Fragment implements View.OnClickListener {
     public void onStart() {
         super.onStart();
         taskDatabase = ((TaskApplication) getActivity().getApplicationContext()).getDatabase();
-        floatingActionButton = getActivity().findViewById(R.id.add_tasks_fab);
-        floatingActionButton.setVisibility(View.INVISIBLE);
 
         taskToEdit = getArguments().getParcelable("TASK");
         taskNotCompletedToEdit = getArguments().getParcelable("TASKS_NOT_COMPLETED");
@@ -93,15 +90,15 @@ public class EditTasks extends Fragment implements View.OnClickListener {
             }
         });
         if (taskNotCompletedToEdit != null){
-            editTaskTitle.setText(taskNotCompletedToEdit.getTaskTitleNotC());
-            editTaskDescription.setText(taskNotCompletedToEdit.getTaskDescriptionNotC());
-            editTimeEditText.setText(taskNotCompletedToEdit.getTimeDueNotC());
-            editDateEditText.setText(taskNotCompletedToEdit.getDateDueNotC());
+            editTaskTitle.setText(taskNotCompletedToEdit.getTaskTitle());
+            editTaskDescription.setText(taskNotCompletedToEdit.getTaskDescription());
+            editTimeEditText.setText(taskNotCompletedToEdit.getTimeDue());
+            editDateEditText.setText(taskNotCompletedToEdit.getDateDue());
         } else if (taskCompletedToEdit != null){
-            editTaskTitle.setText(taskCompletedToEdit.getTaskTitleDone());
-            editTaskDescription.setText(taskCompletedToEdit.getTaskDescriptionDone());
-            editTimeEditText.setText(taskCompletedToEdit.getTimeDueDone());
-            editTimeEditText.setText(taskCompletedToEdit.getDateDueDone());
+            editTaskTitle.setText(taskCompletedToEdit.getTaskTitle());
+            editTaskDescription.setText(taskCompletedToEdit.getTaskDescription());
+            editTimeEditText.setText(taskCompletedToEdit.getTimeDue());
+            editTimeEditText.setText(taskCompletedToEdit.getDateDue());
         } else if (taskToEdit != null){
             editTaskTitle.setText(taskToEdit.getTaskTitle());
             editTaskDescription.setText(taskToEdit.getTaskDescription());
@@ -168,15 +165,15 @@ public class EditTasks extends Fragment implements View.OnClickListener {
         String editedTimeDue = editTimeEditText.getText().toString();
 
         if(taskNotCompletedToEdit != null){
-            taskNotCompletedToEdit.setTimeDueNotC(editedTimeDue);
-            taskNotCompletedToEdit.setTaskTitleNotC(editedTaskTitle);
-            taskNotCompletedToEdit.setTaskDescriptionNotC(editedTaskDescription);
-            taskNotCompletedToEdit.setDateDueNotC(editedDateDue);
+            taskNotCompletedToEdit.setTimeDue(editedTimeDue);
+            taskNotCompletedToEdit.setTaskTitle(editedTaskTitle);
+            taskNotCompletedToEdit.setTaskDescription(editedTaskDescription);
+            taskNotCompletedToEdit.setDateDue(editedDateDue);
         } else if (taskCompletedToEdit != null){
-            taskCompletedToEdit.setTimeDueDone(editedTimeDue);
-            taskCompletedToEdit.setTaskTitleDone(editedTaskTitle);
-            taskCompletedToEdit.setTaskDescriptionDone(editedTaskDescription);
-            taskCompletedToEdit.setDateDueDone(editedDateDue);
+            taskCompletedToEdit.setTimeDue(editedTimeDue);
+            taskCompletedToEdit.setTaskTitle(editedTaskTitle);
+            taskCompletedToEdit.setTaskDescription(editedTaskDescription);
+            taskCompletedToEdit.setDateDue(editedDateDue);
         } else if (taskToEdit != null){
             taskToEdit.setTimeDue(editedTimeDue);
             taskToEdit.setTaskTitle(editedTaskTitle);
@@ -186,17 +183,18 @@ public class EditTasks extends Fragment implements View.OnClickListener {
         updateEditTasksList(taskToEdit, taskNotCompletedToEdit, taskCompletedToEdit);
         Toast.makeText(getActivity(), "Task Edited!!", Toast.LENGTH_SHORT).show();
     }
-    private void updateEditTasksList(final Tasks taskToEdit, TaskNotCompleted taskNotCompletedToEdit, TaskCompleted taskCompletedToEdit){
+    private void updateEditTasksList(final Tasks taskToEdit, final Tasks taskNotCompletedToEdit, final Tasks taskCompletedToEdit){
         if (taskToEdit != null){
             taskDatabase.taskDao().updateTaskList(taskToEdit);
             infoCallback.getInfo();
         } else if (taskNotCompletedToEdit != null){
-            taskDatabase.taskDaoTab2().updateTaskListNotC(taskNotCompletedToEdit);
+            taskDatabase.taskDao().updateTaskList(taskNotCompletedToEdit);
             infoCallbackTab2.getInfoTab2();
         } else if (taskCompletedToEdit != null){
-            taskDatabase.taskDaoTab3().updateTaskListCompleted(taskCompletedToEdit);
+            taskDatabase.taskDao().updateTaskList(taskCompletedToEdit);
             infoCallbackTab3.getInfoTab3();
         }
+
     }
 
     public void attachParentEditTasks(InfoCallback infoCallback) {

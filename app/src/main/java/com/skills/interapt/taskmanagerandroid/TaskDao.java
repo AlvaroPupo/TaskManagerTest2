@@ -2,6 +2,7 @@ package com.skills.interapt.taskmanagerandroid;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
@@ -27,7 +28,6 @@ public interface TaskDao {
     //Allows us to delete a game from the library
     @Delete
     void deleteTaskList(Tasks tasks);
-
 
 }
 

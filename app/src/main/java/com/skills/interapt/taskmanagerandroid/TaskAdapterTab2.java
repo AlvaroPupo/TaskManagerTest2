@@ -7,6 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -20,16 +23,13 @@ import butterknife.ButterKnife;
 
 public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHolder>{
 
-    private List<TaskNotCompleted> tasksNotCompletedList;
+    private List<Tasks> tasksNotCompletedList;
     private AdapterCallbackTab2 adapterCallbackTab2;
-    private MarkedAsCompleted markedAsCompleted;
-    private TaskDatabase taskDatabase;
 
-    public TaskAdapterTab2(List<TaskNotCompleted> tasksNotCompletedList, AdapterCallbackTab2 adapterCallbackTab2) {
+    public TaskAdapterTab2(List<Tasks> tasksNotCompletedList, AdapterCallbackTab2 adapterCallbackTab2) {
         this.tasksNotCompletedList = tasksNotCompletedList;
         this.adapterCallbackTab2 = adapterCallbackTab2;
     }
-
 
     @NonNull
     @Override
@@ -44,6 +44,8 @@ public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHo
 
         holder.itemView.setOnClickListener(holder.onClick(tasksNotCompletedList.get(position)));
         holder.itemView.setOnLongClickListener(holder.onLongClick(tasksNotCompletedList.get(position)));
+        holder.switchTasks.setOnCheckedChangeListener(holder.onSwitchClickedTab2(tasksNotCompletedList.get(position)));
+        holder.deleteTaskButton.setOnClickListener(holder.onDeleteTaskButtonClicked(tasksNotCompletedList.get(position)));
     }
 
     @Override
@@ -51,7 +53,7 @@ public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHo
         return tasksNotCompletedList.size();
     }
 
-    public void updateList(List<TaskNotCompleted> list){
+    public void updateList(List<Tasks> list){
         tasksNotCompletedList = list;
         notifyDataSetChanged();
     }
@@ -68,37 +70,32 @@ public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHo
         protected TextView taskDescription;
         @BindView(R.id.item_date_created)
         protected TextView timeCreated;
+        @BindView(R.id.switch_tasks)
+        protected Switch switchTasks;
+        @BindView(R.id.delete_task_button)
+        protected Button deleteTaskButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindNotCompletedTasks(TaskNotCompleted tasks) {
+        public void bindNotCompletedTasks(Tasks tasks) {
 
-                taskTitle.setText(tasks.getTaskTitleNotC());
-                taskDescription.setText(adapterCallbackTab2.getContext().getString(R.string.task_description, tasks.getTaskDescriptionNotC()));
-                taskDate.setVisibility(View.VISIBLE);
-                taskDate.setText(adapterCallbackTab2.getContext().getString(R.string.task_due_date, tasks.getDateDueNotC(), tasks.getTimeDueNotC()));
-                timeCreated.setText(adapterCallbackTab2.getContext().getString(R.string.created_on, tasks.getDateCreatedNotC()));
+            rowLayout.setBackgroundResource(R.color.green);
+            taskTitle.setText(tasks.getTaskTitle());
+            taskDescription.setText(adapterCallbackTab2.getContext().getString(R.string.task_description, tasks.getTaskDescription()));
+            taskDate.setVisibility(View.VISIBLE);
+            taskDate.setText(adapterCallbackTab2.getContext().getString(R.string.task_due_date, tasks.getDateDue(), tasks.getTimeDue()));
+            timeCreated.setText(adapterCallbackTab2.getContext().getString(R.string.created_on, tasks.getDateCreated()));
+            switchTasks.setText("Not Completed!!");
 
-
-            if (tasks.isCompletedNotC()) {
-
-//                rowLayout.setBackgroundResource(R.color.colorPrimary);
-//                Calendar calendar = Calendar.getInstance();
-//                Date date = calendar.getTime();
-//                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy - HH:mm a", Locale.US);
-//                taskDate.setText(adapterCallbackTab2.getContext().getString(R.string.completed_on, formatter.format(date)));
-//                TaskCompleted taskCompleted = new TaskCompleted(tasks.getTaskTitleNotC(),tasks.getTaskDescriptionNotC(),true, tasks.getDateDueNotC(),tasks.getTimeDueNotC(),tasks.getDateCreatedNotC());
-//                addToCompletedTasksDatabase(taskCompleted);
-
-            } else {
-                rowLayout.setBackgroundResource(R.color.green);
+            if (tasks.isCompleted()) {
+                rowLayout.setVisibility(View.GONE);
             }
         }
 
-        public View.OnClickListener onClick(final TaskNotCompleted tasks) {
+        public View.OnClickListener onClick(final Tasks tasks) {
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -107,7 +104,7 @@ public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHo
             };
         }
 
-        public View.OnLongClickListener onLongClick(final TaskNotCompleted tasks) {
+        public View.OnLongClickListener onLongClick(final Tasks tasks) {
             return new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -116,16 +113,31 @@ public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHo
                 }
             };
         }
-//        private void addToCompletedTasksDatabase(final TaskCompleted taskCompleted){
-//            markedAsCompleted.bindCompletedTasksTab3(taskCompleted);
-//        }
+
+        public CompoundButton.OnCheckedChangeListener onSwitchClickedTab2(final Tasks taskNotCompleted) {
+            return new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    adapterCallbackTab2.onSwitchClickedTab2(taskNotCompleted);
+                }
+            };
+        }
+
+        public View.OnClickListener onDeleteTaskButtonClicked(final Tasks tasks) {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapterCallbackTab2.onDeleteTaskButtonClicked(tasks);
+                }
+            };
+        }
     }
     public interface AdapterCallbackTab2 {
-        void rowOnClickedTab2(TaskNotCompleted tasks);
-        void rowLongClickedTab2(TaskNotCompleted tasks);
+        void rowOnClickedTab2(Tasks tasks);
+        void rowLongClickedTab2(Tasks tasks);
         Context getContext();
+        void onSwitchClickedTab2(Tasks taskNotCompleted);
+        void onDeleteTaskButtonClicked(Tasks tasks);
     }
-    public interface MarkedAsCompleted{
-            void bindCompletedTasksTab3(TaskCompleted taskCompleted);
-    }
+
 }

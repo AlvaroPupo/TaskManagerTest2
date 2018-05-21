@@ -31,6 +31,7 @@ public class AddTaskFragment extends Fragment implements View.OnClickListener{
     private ActivityCallback activityCallback;
     private TaskDatabase taskDatabase;
     private FloatingActionButton floatingActionButton;
+    private TaskAdapterTab2 taskAdapterTab2;
 
     Button datePicker, timePicker;
     EditText txtDate, txtTime;
@@ -136,19 +137,15 @@ public class AddTaskFragment extends Fragment implements View.OnClickListener{
             Toast.makeText(getActivity(), "Please enter required fields", Toast.LENGTH_LONG).show();
         } else {
             Tasks tasks = new Tasks(taskTitle.getText().toString(), taskDescription.getText().toString(), newDate, newTime, timeCreated);
-            TaskNotCompleted taskNotCompleted = new TaskNotCompleted(taskTitle.getText().toString(), taskDescription.getText().toString(),false, newDate, newTime, timeCreated);
-//            TaskCompleted taskCompleted = new TaskCompleted(taskTitle.getText().toString(), taskDescription.getText().toString(), false, newDate, newTime, timeCreated);
 
-            addTaskToDatabase(tasks, taskNotCompleted);
+            addTaskToDatabase(tasks);
             Toast.makeText(getActivity(), "Task Added!!", Toast.LENGTH_LONG).show();
         }
     }
 
-    private void addTaskToDatabase(final Tasks tasks, final TaskNotCompleted taskNotCompleted) {
+    private void addTaskToDatabase(final Tasks tasks) {
 
         taskDatabase.taskDao().addTasks(tasks);
-        taskDatabase.taskDaoTab2().addTasksTab2(taskNotCompleted);
-//        taskDatabase.taskDaoTab3().addTasksTab3(taskCompleted);
         activityCallback.addClicked();
     }
 

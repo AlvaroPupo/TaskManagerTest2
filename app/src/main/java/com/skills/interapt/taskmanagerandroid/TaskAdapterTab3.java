@@ -7,6 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -20,18 +23,12 @@ import butterknife.ButterKnife;
 
 public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHolder>{
 
-    private List<TaskCompleted> tasksCompletedList;
+    private List<Tasks> tasksCompletedList;
     private AdapterCallbackTab3 adapterCallbackTab3;
-    private TaskAdapter.AdapterCallback adapterCallback;
 
-    public TaskAdapterTab3(List<TaskCompleted> tasksCompletedList, AdapterCallbackTab3 adapterCallbackTab3) {
+    public TaskAdapterTab3(List<Tasks> tasksCompletedList, AdapterCallbackTab3 adapterCallbackTab3) {
         this.tasksCompletedList = tasksCompletedList;
         this.adapterCallbackTab3 = adapterCallbackTab3;
-    }
-
-    public TaskAdapterTab3(List<TaskCompleted> allTasksCompleted, TaskAdapter.AdapterCallback adapterCallback) {
-        this.tasksCompletedList = allTasksCompleted;
-        this.adapterCallback = adapterCallback;
     }
 
     @NonNull
@@ -45,9 +42,11 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
     @Override
     public void onBindViewHolder(@NonNull TaskAdapterTab3.ViewHolder holder, int position) {
 
-        holder.bindCompletedTasks(tasksCompletedList.get(position));
-        holder.itemView.setOnClickListener(holder.onClick(tasksCompletedList.get(position)));
-        holder.itemView.setOnLongClickListener(holder.onLongClick(tasksCompletedList.get(position)));
+            holder.bindCompletedTasks(tasksCompletedList.get(position));
+            holder.itemView.setOnClickListener(holder.onClick(tasksCompletedList.get(position)));
+            holder.itemView.setOnLongClickListener(holder.onLongClick(tasksCompletedList.get(position)));
+            holder.switchTasks.setOnCheckedChangeListener(holder.onSwitchClickedTab3(tasksCompletedList.get(position)));
+            holder.deleteTaskButton.setOnClickListener(holder.onDeleteTaskButtonCliked(tasksCompletedList.get(position)));
     }
 
     @Override
@@ -55,10 +54,11 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
         return tasksCompletedList.size();
     }
 
-    public void updateList(List<TaskCompleted> list) {
+    public void updateList(List<Tasks> list) {
         tasksCompletedList = list;
         notifyDataSetChanged();
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -72,34 +72,39 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
         protected TextView taskDescription;
         @BindView(R.id.item_date_created)
         protected TextView timeCreated;
+        @BindView(R.id.switch_tasks)
+        protected Switch switchTasks;
+        @BindView(R.id.delete_task_button)
+        protected Button deleteTaskButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindCompletedTasks(TaskCompleted tasks) {
+        public void bindCompletedTasks(Tasks tasks) {
 
+            rowLayout.setVisibility(View.VISIBLE);
+            taskTitle.setText(tasks.getTaskTitle());
+            taskDescription.setText(adapterCallbackTab3.getContext().getString(R.string.task_description, tasks.getTaskDescription()));
+            taskDate.setVisibility(View.VISIBLE);
+            taskDate.setText(adapterCallbackTab3.getContext().getString(R.string.task_due_date, tasks.getDateDue(), tasks.getTimeDue()));
+            timeCreated.setText(adapterCallbackTab3.getContext().getString(R.string.created_on, tasks.getDateCreated()));
 
-            if(tasks.isCompletedDone()) {
-                    rowLayout.setVisibility(View.VISIBLE);
-                    taskTitle.setText(tasks.getTaskTitleDone());
-                    taskDescription.setText(adapterCallbackTab3.getContext().getString(R.string.task_description, tasks.getTaskDescriptionDone()));
-                    taskDate.setVisibility(View.VISIBLE);
-                    taskDate.setText(adapterCallbackTab3.getContext().getString(R.string.task_due_date, tasks.getDateDueDone(), tasks.getTimeDueDone()));
-                    timeCreated.setText(adapterCallbackTab3.getContext().getString(R.string.created_on, tasks.getDateCreatedDone()));
+            if(tasks.isCompleted()) {
 
                     rowLayout.setBackgroundResource(R.color.colorPrimary);
                     Calendar calendar = Calendar.getInstance();
                     Date date = calendar.getTime();
                     SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy - HH:mm a", Locale.US);
                     taskDate.setText(adapterCallbackTab3.getContext().getString(R.string.completed_on, formatter.format(date)));
-                } else {
-                rowLayout.setVisibility(View.INVISIBLE);
+                    switchTasks.setText("Completed!!");
+            } else {
+                rowLayout.setVisibility(View.GONE);
             }
             }
 
-        public View.OnClickListener onClick(final TaskCompleted tasks) {
+        public View.OnClickListener onClick(final Tasks tasks) {
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -108,7 +113,7 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
             };
         }
 
-        public View.OnLongClickListener onLongClick(final TaskCompleted tasks) {
+        public View.OnLongClickListener onLongClick(final Tasks tasks) {
             return new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -118,11 +123,31 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
                 }
             };
         }
+
+        public CompoundButton.OnCheckedChangeListener onSwitchClickedTab3(final Tasks taskCompleted) {
+            return new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    adapterCallbackTab3.onSwitchClickedTab3(taskCompleted);
+                }
+            };
+        }
+
+        public View.OnClickListener onDeleteTaskButtonCliked(final Tasks tasks) {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapterCallbackTab3.onDeleteTaskButtonClicked(tasks);
+                }
+            };
+        }
     }
         public interface AdapterCallbackTab3{
-            void rowClickedTab3(TaskCompleted tasks);
-            void rowLongClickedTab3(TaskCompleted tasks);
+            void rowClickedTab3(Tasks tasks);
+            void rowLongClickedTab3(Tasks tasks);
             Context getContext();
+            void onSwitchClickedTab3(Tasks taskCompleted);
+            void onDeleteTaskButtonClicked(Tasks tasks);
         }
     }
 

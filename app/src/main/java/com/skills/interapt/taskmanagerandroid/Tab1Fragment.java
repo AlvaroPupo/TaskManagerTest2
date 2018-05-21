@@ -20,18 +20,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallback, AddTaskFragment.ActivityCallback, EditTasks.InfoCallback{
+public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallback, AddTaskFragment.ActivityCallback, EditTasks.InfoCallback {
 
     @BindView(R.id.recycler_view_tab1)
     protected RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
     private EditTasks editTasks;
-//    private SyncView syncView;
 
     private TaskDatabase taskDatabase;
     private TaskAdapter taskAdapter;
-    private TaskAdapterTab3 taskAdapterTab3;
-    private TaskCompleted taskCompleted;
 
     private LinearLayoutManager linearLayoutManager;
     private AddTaskFragment addTaskFragment;
@@ -49,7 +46,6 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         super.onStart();
         floatingActionButton = getActivity().findViewById(R.id.add_tasks_fab);
         taskDatabase = ((TaskApplication) getContext()).getDatabase();
-        taskAdapterTab3 = new TaskAdapterTab3(taskDatabase.taskDaoTab3().getAllTasksCompleted(), this);
         setUpRecyclerView();
     }
 
@@ -76,12 +72,15 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         getActivity().getSupportFragmentManager().beginTransaction().remove(addTaskFragment).commit();
         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
         floatingActionButton.setVisibility(View.VISIBLE);
+        taskAdapter.notifyDataSetChanged();
     }
+
     @Override
     public void getInfo() {
         getActivity().getSupportFragmentManager().beginTransaction().remove(editTasks).commit();
         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
         floatingActionButton.setVisibility(View.VISIBLE);
+        taskAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -93,6 +92,7 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
     @Override
     public void rowClicked(Tasks tasks) {
 
+        floatingActionButton.setVisibility(View.INVISIBLE);
         editTasks = EditTasks.newInstance();
         Bundle bundle = new Bundle();
         bundle.putParcelable("TASK", tasks);
@@ -104,6 +104,21 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
     @Override
     public void rowLongClicked(final Tasks tasks) {
 
+
+    }
+
+    @Override
+    public void onSwitchClicked(Tasks tasks) {
+        if (tasks.isCompleted()) {
+            markAsNotCompleted(tasks);
+        } else {
+            markAsCompleted(tasks);
+        }
+    }
+
+    @Override
+    public void onDeleteButtonClicked(final Tasks tasks) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete this Task?")
                 .setMessage("Are you sure you would like to delete this task?")
@@ -113,6 +128,7 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
                         taskDatabase.taskDao().deleteTaskList(tasks);
                         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
                         Toast.makeText(getActivity(), "Task Deleted!", Toast.LENGTH_LONG).show();
+                        taskAdapter.notifyDataSetChanged();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -124,14 +140,7 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-    @Override
-    public void onSwitchClicked(Tasks tasks) {
-        if (tasks.isCompleted()) {
-            markAsNotCompleted(tasks);
-        } else {
-            markAsCompleted(tasks);
-        }
-    }
+
 
     private void markAsCompleted(final Tasks tasks) {
 
@@ -139,22 +148,8 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         taskDatabase.taskDao().updateTaskList(tasks);
         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
 
-        String taskTitleToCompleted = tasks.getTaskTitle();
-        String taskDescriptionToCompleted = tasks.getTaskDescription();
-        String taskDateDueToCompleted = tasks.getDateDue();
-        String taskTimeDueToCompleted = tasks.getTimeDue();
-        String tasktimeCreatedToCompleted = tasks.getDateCreated();
-
-        taskCompleted = new TaskCompleted(taskTitleToCompleted,taskDescriptionToCompleted,true,taskDateDueToCompleted,taskTimeDueToCompleted,tasktimeCreatedToCompleted);
-
-        AddTaskAsCompleted(taskCompleted);
-
         Toast.makeText(getActivity(), "Task Completed!", Toast.LENGTH_LONG).show();
-    }
-
-    private void AddTaskAsCompleted(TaskCompleted taskCompleted) {
-        taskDatabase.taskDaoTab3().addTasksTab3(taskCompleted);
-        taskAdapterTab3.updateList(taskDatabase.taskDaoTab3().getAllTasksCompleted());
+        taskAdapter.notifyDataSetChanged();
     }
 
     private void markAsNotCompleted(final Tasks tasks) {
@@ -163,13 +158,13 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         taskDatabase.taskDao().updateTaskList(tasks);
         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
 
-        taskDatabase.taskDaoTab3().deleteTaskListCompleted(taskCompleted);
-
-        taskAdapterTab3.updateList(taskDatabase.taskDaoTab3().getAllTasksCompleted());
         Toast.makeText(getActivity(), R.string.not_completed_mark, Toast.LENGTH_LONG).show();
+        taskAdapter.notifyDataSetChanged();
     }
 
-}
+    }
+
+
 
 
 

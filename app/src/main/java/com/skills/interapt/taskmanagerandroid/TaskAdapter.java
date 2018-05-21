@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -50,6 +51,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         holder.itemView.setOnClickListener(holder.onClick(tasksList.get(position)));
         holder.itemView.setOnLongClickListener(holder.onLongClick(tasksList.get(position)));
         holder.switchTasks.setOnCheckedChangeListener(holder.onSwithClicked(tasksList.get(position)));
+        holder.deleteButton.setOnClickListener(holder.onDeleteButtonClicked(tasksList.get(position)));
     }
 
     @Override
@@ -77,6 +79,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         protected TextView timeCreated;
         @BindView(R.id.switch_tasks)
         protected Switch switchTasks;
+        @BindView(R.id.delete_task_button)
+        protected Button deleteButton;
 
 
         public ViewHolder(View itemView) {
@@ -98,10 +102,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                     Date date = calendar.getTime();
                     SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy - HH:mm a", Locale.US);
                     taskDate.setText(adapterCallback.getContext().getString(R.string.completed_on, formatter.format(date)));
-                    switchTasks.setText("Mark As Not Completed?");
+                    switchTasks.setText("Completed!!");
                 } else {
                     rowLayout.setBackgroundResource(R.color.green);
-                    switchTasks.setText("Mark As Completed?");
+                    switchTasks.setText("Not Completed!!");
                 }
             }
 
@@ -133,6 +137,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                 }
             };
         }
+
+        public View.OnClickListener onDeleteButtonClicked(final Tasks tasks) {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapterCallback.onDeleteButtonClicked(tasks);
+                }
+            };
+        }
     }
 
 
@@ -141,5 +154,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         void rowClicked(Tasks tasks);
         void rowLongClicked(Tasks tasks);
         void onSwitchClicked(Tasks tasks);
+        void onDeleteButtonClicked(Tasks tasks);
     }
 }

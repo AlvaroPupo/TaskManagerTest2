@@ -14,7 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCallbackTab3, EditTasks.InfoCallbackTab3{
+import java.util.List;
+
+public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCallbackTab3, EditTasks.InfoCallbackTab3 {
 
     private TaskDatabase taskDatabaseTab3;
     private TaskAdapterTab3 tab3Adapter;
@@ -42,7 +44,7 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
     private void populateRecyclerView() {
 
         linearLayoutManagerTab3 = new LinearLayoutManager(getActivity().getApplicationContext());
-        tab3Adapter = new TaskAdapterTab3(taskDatabaseTab3.taskDaoTab3().getAllTasksCompleted(), this);
+        tab3Adapter = new TaskAdapterTab3(taskDatabaseTab3.taskDao().getTasks(), this);
         recyclerViewTab3.setLayoutManager(linearLayoutManagerTab3);
         recyclerViewTab3.setHasFixedSize(false);
         recyclerViewTab3.setAdapter(tab3Adapter);
@@ -50,7 +52,9 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
     }
 
     @Override
-    public void rowClickedTab3(TaskCompleted tasksCompleted) {
+    public void rowClickedTab3(Tasks tasksCompleted) {
+
+        floatingActionButton.setVisibility(View.INVISIBLE);
         editTasks = EditTasks.newInstance();
         Bundle bundle = new Bundle();
         bundle.putParcelable("TASKS_COMPLETED", tasksCompleted);
@@ -58,24 +62,40 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
         editTasks.attachParentEditTasksTab3(this);
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.constraint_layout_tab3, editTasks).commit();
     }
+
     @Override
     public void getInfoTab3() {
         getActivity().getSupportFragmentManager().beginTransaction().remove(editTasks).commit();
-        tab3Adapter.updateList(taskDatabaseTab3.taskDaoTab3().getAllTasksCompleted());
+        tab3Adapter.updateList(taskDatabaseTab3.taskDao().getTasks());
         floatingActionButton.setVisibility(View.VISIBLE);
+        tab3Adapter.notifyDataSetChanged();
     }
 
     @Override
-    public void rowLongClickedTab3(final TaskCompleted tasksCompleted) {
+    public void rowLongClickedTab3(final Tasks tasksCompleted) {
+
+    }
+
+    @Override
+    public void onSwitchClickedTab3(Tasks taskCompleted) {
+        if (taskCompleted.isCompleted()) {
+            markAsNotCompleted(taskCompleted);
+        }
+    }
+
+    @Override
+    public void onDeleteTaskButtonClicked(final Tasks tasks) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete this Task?")
                 .setMessage("Are you sure you would like to delete this task?")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        taskDatabaseTab3.taskDaoTab3().deleteTaskListCompleted(tasksCompleted);
-                        tab3Adapter.updateList(taskDatabaseTab3.taskDaoTab3().getAllTasksCompleted());
+                        taskDatabaseTab3.taskDao().deleteTaskList(tasks);
+                        tab3Adapter.updateList(taskDatabaseTab3.taskDao().getTasks());
                         Toast.makeText(getActivity(), "Task Deleted!", Toast.LENGTH_LONG).show();
+                        tab3Adapter.notifyDataSetChanged();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -88,56 +108,13 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
                 .show();
     }
 
-    private void markAsCompleted(final TaskCompleted tasksIsCompleted) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Mark As Complete?")
-                .setMessage("Are you sure you would like to mark this task as complete?")
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        tasksIsCompleted.setCompletedDone(true);
-                        //Update Database record for this game
-                        taskDatabaseTab3.taskDaoTab3().updateTaskListCompleted(tasksIsCompleted);
-                        //tell our adapter that the database has been updated so it will update our view.
-                        tab3Adapter.updateList(taskDatabaseTab3.taskDaoTab3().getAllTasksCompleted());
-                        //Tell users that this game has been checked out
-                        Toast.makeText(getActivity(), "Task Completed", Toast.LENGTH_LONG).show();
+    private void markAsNotCompleted(final Tasks taskCompleted) {
 
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
+        taskCompleted.setCompleted(false);
+        taskDatabaseTab3.taskDao().updateTaskList(taskCompleted);
+        tab3Adapter.updateList(taskDatabaseTab3.taskDao().getTasks());
+        Toast.makeText(getActivity(), R.string.not_completed_mark, Toast.LENGTH_LONG).show();
+        tab3Adapter.notifyDataSetChanged();
 
-    private void markAsNotCompleted(final TaskCompleted taskIsCompleted) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.mark_as_not_completed)
-                .setMessage(R.string.mark_as_not_complete)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        taskIsCompleted.setCompletedDone(false);
-                        //Update database with updated game information
-                        taskDatabaseTab3.taskDaoTab3().updateTaskListCompleted(taskIsCompleted);
-                        //Let our adapter know that information in the database has changed to update our view accordingly
-                        tab3Adapter.updateList(taskDatabaseTab3.taskDaoTab3().getAllTasksCompleted());
-
-                        Toast.makeText(getActivity(), R.string.not_completed_mark, Toast.LENGTH_LONG).show();
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
     }
 }
