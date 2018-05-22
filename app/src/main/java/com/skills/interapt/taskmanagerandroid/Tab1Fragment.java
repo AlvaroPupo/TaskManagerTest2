@@ -11,8 +11,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -72,7 +74,6 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         getActivity().getSupportFragmentManager().beginTransaction().remove(addTaskFragment).commit();
         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
         floatingActionButton.setVisibility(View.VISIBLE);
-        taskAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -80,7 +81,6 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         getActivity().getSupportFragmentManager().beginTransaction().remove(editTasks).commit();
         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
         floatingActionButton.setVisibility(View.VISIBLE);
-        taskAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -92,6 +92,20 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
     @Override
     public void rowClicked(Tasks tasks) {
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(tasks.getTaskTitle())
+                .setMessage("Created on : " + tasks.getDateCreated() + "\nDescription - " + tasks.getTaskDescription() + "\nCompleted: " + tasks.isCompleted())
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
+
+    }
+
+    public void editTasks(Tasks tasks){
+
         floatingActionButton.setVisibility(View.INVISIBLE);
         editTasks = EditTasks.newInstance();
         Bundle bundle = new Bundle();
@@ -99,12 +113,6 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         editTasks.setArguments(bundle);
         editTasks.attachParentEditTasks(this);
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.contraint_layout_tab1, editTasks).commit();
-    }
-
-    @Override
-    public void rowLongClicked(final Tasks tasks) {
-
-
     }
 
     @Override
@@ -117,8 +125,29 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
     }
 
     @Override
-    public void onDeleteButtonClicked(final Tasks tasks) {
+    public void onOptionMenuButtonClicked(final Tasks tasks) {
 
+        View v = getActivity().findViewById(R.id.option_menu_button);
+        final PopupMenu popupMenu = new PopupMenu(getContext(), v);
+        popupMenu.inflate(R.menu.recycler_view_items_menu);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.item_2:
+                        editTasks(tasks);
+                        break;
+                    case R.id.item_3:
+                        deleteButtonClicked(tasks);
+                        break;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
+
+        public void deleteButtonClicked(final Tasks tasks){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete this Task?")
                 .setMessage("Are you sure you would like to delete this task?")

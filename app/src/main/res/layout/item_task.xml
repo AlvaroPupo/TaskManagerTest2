@@ -82,13 +82,14 @@
         app:layout_constraintTop_toBottomOf="@+id/item_date_due" />
 
     <Button
-        android:id="@+id/delete_task_button"
-        android:layout_width="30dp"
-        android:layout_height="31dp"
+        android:id="@+id/option_menu_button"
+        android:layout_width="41dp"
+        android:layout_height="36dp"
         android:layout_marginEnd="4dp"
         android:layout_marginTop="4dp"
-        android:background="@android:color/holo_blue_light"
-        android:text="X"
+        android:background="@android:color/transparent"
+        android:text="@string/vertical_ellipsis"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

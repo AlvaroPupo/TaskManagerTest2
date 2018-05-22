@@ -2,6 +2,7 @@ package com.skills.interapt.taskmanagerandroid;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -31,7 +33,6 @@ public class AddTaskFragment extends Fragment implements View.OnClickListener{
     private ActivityCallback activityCallback;
     private TaskDatabase taskDatabase;
     private FloatingActionButton floatingActionButton;
-    private TaskAdapterTab2 taskAdapterTab2;
 
     Button datePicker, timePicker;
     EditText txtDate, txtTime;
@@ -142,6 +143,10 @@ public class AddTaskFragment extends Fragment implements View.OnClickListener{
             Toast.makeText(getActivity(), "Task Added!!", Toast.LENGTH_LONG).show();
         }
     }
+    @OnClick(R.id.cancel_button)
+    protected void onCancelButtonClicked(){
+        activityCallback.addClicked();
+    }
 
     private void addTaskToDatabase(final Tasks tasks) {
 
@@ -152,7 +157,6 @@ public class AddTaskFragment extends Fragment implements View.OnClickListener{
     public void attachParent(ActivityCallback activityCallback) {
         this.activityCallback = activityCallback;
     }
-
 
     public interface ActivityCallback {
         void addClicked();

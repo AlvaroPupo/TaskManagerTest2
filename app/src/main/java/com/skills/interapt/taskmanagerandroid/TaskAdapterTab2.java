@@ -12,11 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,7 +41,7 @@ public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHo
         holder.itemView.setOnClickListener(holder.onClick(tasksNotCompletedList.get(position)));
         holder.itemView.setOnLongClickListener(holder.onLongClick(tasksNotCompletedList.get(position)));
         holder.switchTasks.setOnCheckedChangeListener(holder.onSwitchClickedTab2(tasksNotCompletedList.get(position)));
-        holder.deleteTaskButton.setOnClickListener(holder.onDeleteTaskButtonClicked(tasksNotCompletedList.get(position)));
+        holder.optionMenuButton.setOnClickListener(holder.onMenuOptionButtonClicked(tasksNotCompletedList.get(position)));
     }
 
     @Override
@@ -72,8 +68,8 @@ public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHo
         protected TextView timeCreated;
         @BindView(R.id.switch_tasks)
         protected Switch switchTasks;
-        @BindView(R.id.delete_task_button)
-        protected Button deleteTaskButton;
+        @BindView(R.id.option_menu_button)
+        protected Button optionMenuButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -123,11 +119,11 @@ public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHo
             };
         }
 
-        public View.OnClickListener onDeleteTaskButtonClicked(final Tasks tasks) {
+        public View.OnClickListener onMenuOptionButtonClicked(final Tasks tasks) {
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    adapterCallbackTab2.onDeleteTaskButtonClicked(tasks);
+                    adapterCallbackTab2.onMenuOptionClicked(tasks);
                 }
             };
         }
@@ -137,7 +133,7 @@ public class TaskAdapterTab2 extends RecyclerView.Adapter<TaskAdapterTab2.ViewHo
         void rowLongClickedTab2(Tasks tasks);
         Context getContext();
         void onSwitchClickedTab2(Tasks taskNotCompleted);
-        void onDeleteTaskButtonClicked(Tasks tasks);
+        void onMenuOptionClicked(Tasks tasks);
     }
 
 }

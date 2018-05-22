@@ -10,8 +10,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.List;
@@ -54,10 +57,21 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
     @Override
     public void rowClickedTab3(Tasks tasksCompleted) {
 
-        floatingActionButton.setVisibility(View.INVISIBLE);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(tasksCompleted.getTaskTitle())
+                .setMessage("Created on : " + tasksCompleted.getDateCreated() + "\nDescription - " + tasksCompleted.getTaskDescription() + "\nCompleted: " + tasksCompleted.isCompleted())
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
+    }
+    public void editTasksButtonClicked(final Tasks tasks){
+
         editTasks = EditTasks.newInstance();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("TASKS_COMPLETED", tasksCompleted);
+        bundle.putParcelable("TASKS_COMPLETED", tasks);
         editTasks.setArguments(bundle);
         editTasks.attachParentEditTasksTab3(this);
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.constraint_layout_tab3, editTasks).commit();
@@ -84,7 +98,28 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
     }
 
     @Override
-    public void onDeleteTaskButtonClicked(final Tasks tasks) {
+    public void onOptionMenuButtonClicked(final Tasks tasks) {
+
+        View v = getActivity().findViewById(R.id.option_menu_button);
+        PopupMenu popupMenu = new PopupMenu(getContext(), v);
+        popupMenu.inflate(R.menu.recycler_view_items_menu);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.item_2:
+                        editTasksButtonClicked(tasks);
+                        break;
+                    case R.id.item_3:
+                        onDeleteButtonClicked(tasks);
+                        break;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
+    public void onDeleteButtonClicked(final Tasks tasks){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete this Task?")

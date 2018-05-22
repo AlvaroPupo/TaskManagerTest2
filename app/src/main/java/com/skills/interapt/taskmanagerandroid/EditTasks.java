@@ -35,6 +35,7 @@ public class EditTasks extends Fragment implements View.OnClickListener {
     private Tasks taskCompletedToEdit;
     private InfoCallbackTab2 infoCallbackTab2;
     private InfoCallbackTab3 infoCallbackTab3;
+    private EditTasks editTasks;
 
     Button editTimePicker, editDatePicker;
     EditText editTimeEditText, editDateEditText, editTaskTitle, editTaskDescription;
@@ -153,6 +154,17 @@ public class EditTasks extends Fragment implements View.OnClickListener {
                         }
                     }, mHour, mMinute, false);
             timePickerDialog.show();
+        }
+    }
+
+    @OnClick(R.id.cancel_edit_task_button)
+    protected void onCancelEditTaskButtonClicked(){
+        if(taskToEdit != null){
+            infoCallback.getInfo();
+        } else if (taskNotCompletedToEdit != null){
+            infoCallbackTab2.getInfoTab2();
+        } else if (taskCompletedToEdit != null){
+            infoCallbackTab3.getInfoTab3();
         }
     }
 

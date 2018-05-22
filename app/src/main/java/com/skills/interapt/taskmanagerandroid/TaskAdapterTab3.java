@@ -46,7 +46,7 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
             holder.itemView.setOnClickListener(holder.onClick(tasksCompletedList.get(position)));
             holder.itemView.setOnLongClickListener(holder.onLongClick(tasksCompletedList.get(position)));
             holder.switchTasks.setOnCheckedChangeListener(holder.onSwitchClickedTab3(tasksCompletedList.get(position)));
-            holder.deleteTaskButton.setOnClickListener(holder.onDeleteTaskButtonCliked(tasksCompletedList.get(position)));
+            holder.optionMenuButton.setOnClickListener(holder.onOptionMenuClicked(tasksCompletedList.get(position)));
     }
 
     @Override
@@ -74,8 +74,8 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
         protected TextView timeCreated;
         @BindView(R.id.switch_tasks)
         protected Switch switchTasks;
-        @BindView(R.id.delete_task_button)
-        protected Button deleteTaskButton;
+        @BindView(R.id.option_menu_button)
+        protected Button optionMenuButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -133,11 +133,11 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
             };
         }
 
-        public View.OnClickListener onDeleteTaskButtonCliked(final Tasks tasks) {
+        public View.OnClickListener onOptionMenuClicked(final Tasks tasks) {
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    adapterCallbackTab3.onDeleteTaskButtonClicked(tasks);
+                    adapterCallbackTab3.onOptionMenuButtonClicked(tasks);
                 }
             };
         }
@@ -147,7 +147,7 @@ public class TaskAdapterTab3 extends RecyclerView.Adapter<TaskAdapterTab3.ViewHo
             void rowLongClickedTab3(Tasks tasks);
             Context getContext();
             void onSwitchClickedTab3(Tasks taskCompleted);
-            void onDeleteTaskButtonClicked(Tasks tasks);
+            void onOptionMenuButtonClicked(Tasks tasks);
         }
     }
 

@@ -20,7 +20,6 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
@@ -33,6 +32,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     public TaskAdapter(List<Tasks> tasksList, AdapterCallback adapterCallback) {
         this.tasksList = tasksList;
         this.adapterCallback = adapterCallback;
+
     }
 
     @NonNull
@@ -49,9 +49,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         holder.bindTask(tasksList.get(position));
 
         holder.itemView.setOnClickListener(holder.onClick(tasksList.get(position)));
-        holder.itemView.setOnLongClickListener(holder.onLongClick(tasksList.get(position)));
         holder.switchTasks.setOnCheckedChangeListener(holder.onSwithClicked(tasksList.get(position)));
-        holder.deleteButton.setOnClickListener(holder.onDeleteButtonClicked(tasksList.get(position)));
+        holder.optionMenuButton.setOnClickListener(holder.onOptionMenuClicked(tasksList.get(position)));
     }
 
     @Override
@@ -79,8 +78,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         protected TextView timeCreated;
         @BindView(R.id.switch_tasks)
         protected Switch switchTasks;
-        @BindView(R.id.delete_task_button)
-        protected Button deleteButton;
+        @BindView(R.id.option_menu_button)
+        protected Button optionMenuButton;
 
 
         public ViewHolder(View itemView) {
@@ -119,15 +118,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             };
         }
 
-        public View.OnLongClickListener onLongClick(final Tasks tasks) {
-            return new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    adapterCallback.rowLongClicked(tasks);
-                    return true;
-                }
-            };
-        }
 
         public CompoundButton.OnCheckedChangeListener onSwithClicked(final Tasks tasks) {
             return new CompoundButton.OnCheckedChangeListener() {
@@ -138,11 +128,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             };
         }
 
-        public View.OnClickListener onDeleteButtonClicked(final Tasks tasks) {
+        public View.OnClickListener onOptionMenuClicked(final Tasks tasks) {
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    adapterCallback.onDeleteButtonClicked(tasks);
+                    adapterCallback.onOptionMenuButtonClicked(tasks);
                 }
             };
         }
@@ -152,8 +142,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     public interface AdapterCallback {
         Context getContext();
         void rowClicked(Tasks tasks);
-        void rowLongClicked(Tasks tasks);
         void onSwitchClicked(Tasks tasks);
-        void onDeleteButtonClicked(Tasks tasks);
+        void onOptionMenuButtonClicked(Tasks tasks);
+
     }
 }
