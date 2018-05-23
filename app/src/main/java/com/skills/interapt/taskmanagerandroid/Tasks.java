@@ -1,10 +1,7 @@
 package com.skills.interapt.taskmanagerandroid;
 
-import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.Query;
 import android.os.Parcel;
 import android.os.Parcelable;
 
