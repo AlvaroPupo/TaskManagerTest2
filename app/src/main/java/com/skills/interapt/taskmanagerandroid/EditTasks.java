@@ -29,13 +29,11 @@ public class EditTasks extends Fragment implements View.OnClickListener {
 
     private InfoCallback infoCallback;
     private TaskDatabase taskDatabase;
-    private TaskAdapter taskAdapter;
     private Tasks taskToEdit;
     private Tasks taskNotCompletedToEdit;
     private Tasks taskCompletedToEdit;
     private InfoCallbackTab2 infoCallbackTab2;
     private InfoCallbackTab3 infoCallbackTab3;
-    private EditTasks editTasks;
 
     Button editTimePicker, editDatePicker;
     EditText editTimeEditText, editDateEditText, editTaskTitle, editTaskDescription;

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -49,7 +50,7 @@ public class Tab3Fragment extends Fragment implements TaskAdapterTab3.AdapterCal
         linearLayoutManagerTab3 = new LinearLayoutManager(getActivity().getApplicationContext());
         tab3Adapter = new TaskAdapterTab3(taskDatabaseTab3.taskDao().getTasks(), this);
         recyclerViewTab3.setLayoutManager(linearLayoutManagerTab3);
-        recyclerViewTab3.setHasFixedSize(false);
+        recyclerViewTab3.setHasFixedSize(true);
         recyclerViewTab3.setAdapter(tab3Adapter);
         tab3Adapter.notifyDataSetChanged();
     }

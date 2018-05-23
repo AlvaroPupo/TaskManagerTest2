@@ -25,9 +25,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private List<Tasks> tasksList;
 
-
     private AdapterCallback adapterCallback;
-    private Tasks tasks;
 
     public TaskAdapter(List<Tasks> tasksList, AdapterCallback adapterCallback) {
         this.tasksList = tasksList;

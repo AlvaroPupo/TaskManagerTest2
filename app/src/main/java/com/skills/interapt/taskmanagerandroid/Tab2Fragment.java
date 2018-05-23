@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -47,8 +48,10 @@ public class Tab2Fragment extends Fragment implements TaskAdapterTab2.AdapterCal
         linearLayoutManagerTab2 = new LinearLayoutManager(getContext());
         tab2Adapter = new TaskAdapterTab2(taskDatabaseTab2.taskDao().getTasks(),  this);
         recyclerViewTab2.setLayoutManager(linearLayoutManagerTab2);
-        recyclerViewTab2.setHasFixedSize(false);
+        recyclerViewTab2.setHasFixedSize(true);
         recyclerViewTab2.setAdapter(tab2Adapter);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), linearLayoutManagerTab2.getOrientation());
+        recyclerViewTab2.addItemDecoration(dividerItemDecoration);
         tab2Adapter.notifyDataSetChanged();
     }
     @Override

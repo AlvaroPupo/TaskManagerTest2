@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -53,11 +54,14 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
 
     private void setUpRecyclerView() {
 
+
         linearLayoutManager = new LinearLayoutManager(getContext());
         taskAdapter = new TaskAdapter(taskDatabase.taskDao().getTasks(), this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setHasFixedSize(false);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(taskAdapter);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), linearLayoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
         taskAdapter.notifyDataSetChanged();
     }
 
@@ -178,6 +182,7 @@ public class Tab1Fragment extends Fragment implements TaskAdapter.AdapterCallbac
         taskAdapter.updateList(taskDatabase.taskDao().getTasks());
 
         Toast.makeText(getActivity(), "Task Completed!", Toast.LENGTH_LONG).show();
+
         taskAdapter.notifyDataSetChanged();
     }
 
